@@ -16,7 +16,7 @@ firebase = firebase.FirebaseApplication('https://vision-based-id-reader.firebase
 
 #Regex for Registration Number
 def extract_reg_number(string):
-    pat3=re.compile(r'[0-2][0-9][B|M][A-Z][A-Z][0-2][0-9][0-9][0-9]')
+    pat3=re.compile(r'[0-2][0-9][B|M][A-Z]{2}[0-2][0-9]{3}')
     re3=pat3.findall(string)
     re3=''.join(re3)
     return re3
@@ -27,6 +27,13 @@ def extract_names(string):
     names=pattern.findall(string)
     newname=' '.join(names)
     return newname
+
+#Regex for Registration Number
+def extract_phn_number(string):
+    extracted=re.compile(r'[1-9][0-9]{9}')
+    new = extracted.findall(string)
+    new=''.join(new)
+    return new
 
 #Activate Tesseract
 tools = pyocr.get_available_tools()
@@ -44,6 +51,7 @@ while(True):
 
     RegID = extract_reg_number(txt)
     Name = extract_names(txt)
+    PhoneNumber = extract_phn_number(txt)
 
     #Writing the on file; Empty files should not be written
     if Name != "":
@@ -51,6 +59,8 @@ while(True):
             f.write(Name)
             f.write(",")
             f.write(RegID)
+            f.write(",")
+            f.write(PhoneNumber)
             f.write("\n")
 
     cv2.imshow("frame",frame)
@@ -81,6 +91,9 @@ if os.path.getsize(path) > 0:
     #Get the frequency of elements and the elements as lists (in ascending order)
     freq=np.unique(string,return_counts=True)[1].tolist()
     val=np.unique(string,return_counts=True)[0].tolist()
+    
+    phnfreq = np.unique(string,return_counts= True)[1].tolist()
+    phnval=np.unique(string,return_counts=True)[0].tolist() 
 
     regfreq=np.unique(regs,return_counts=True)[1].tolist()
     regval=np.unique(regs,return_counts=True)[0].tolist()
@@ -88,17 +101,20 @@ if os.path.getsize(path) > 0:
     #Get the index where the maximum value is located
     maxindex=freq.index(max(freq))
     maxregindex=regfreq.index(max(regfreq))
+    maxphnindex = phnfreq.index(max(phnfreq))
 
     #Get the most frequently occuring element
     ID=val[maxindex]
     Name=regval[maxregindex]
+    Phn= phnval[maxphnindex]
 
     #printing and post the filtered values
-    Creds = {"Registration Number": ID,"Name":Name}
+    Creds = {"Registration Number": ID,"Name":Name,"Phone Number":Phn}
     results = firebase.post("/TestData/",Creds)
     print("Your details have been registered")
     print("Name:",Name)
     print("Registration Number:",ID)
+    print("Phone Number: ",Phn)
     
 
 else:
