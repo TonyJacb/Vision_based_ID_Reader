@@ -8,6 +8,7 @@ import re
 from firebase import firebase
 import os
 import statistics
+import pandas as pd
 
 # Initialize path of the working directory and temporary file
 path = os.getcwd()+r"/data.txt"
@@ -140,7 +141,7 @@ if os.path.getsize(path) > 0:
     print("Contact Number:", contactNumber)
     print("\nConfirm the details (y/n)")
     submit = input()
-    if((submit.lower == 'y') and (Name != '') and (ID != '') and (contactNumber!='' )):
+    if((submit.lower == 'y') and (pd.isnull(Name)== False) and (pd.isnull(ID)== False) and (pd.isnull(contactNumber)==False)):
         results = firebase.post("/TestData/", Creds)
         print("Your details have been registered")
         os.remove(path)
