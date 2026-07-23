@@ -2,7 +2,7 @@ firebase==3.0.1
 gcloud==0.18.3
 googleapis-common-protos==1.51.0
 httplib2==0.19.0
-jwcrypto==0.7
+jwcrypto==1.5.1
 numpy==1.18.2
 opencv-python==4.2.0.32
 Pillow==8.2.0
